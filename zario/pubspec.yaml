@@ -1,5 +1,5 @@
 name: zario
-description: "Plattformer game"
+description: "Platformer game"
 publish_to: 'none'
 version: 0.1.0
 
@@ -17,4 +17,5 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 flutter:
-  uses-material-design: true
+  assets:
+    - assets/images/

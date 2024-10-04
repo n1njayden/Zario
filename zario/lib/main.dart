@@ -1,7 +1,12 @@
 import 'package:flame/game.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
+import 'zario.dart';
 
 void main() {
-  final game = FlameGame();
-  runApp(GameWidget(game: game));
+  runApp(
+    const GameWidget<Zario>.controlled(
+      gameFactory: Zario.new,
+    ),
+  );
 }
