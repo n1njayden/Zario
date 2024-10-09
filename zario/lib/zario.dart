@@ -1,30 +1,32 @@
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:flame/events.dart';
+import 'package:zario/actors/player.dart';
 
-import 'actors/player.dart';
 import 'actors/water_enemy.dart';
 import 'managers/segment_manager.dart';
 import 'objects/ground_block.dart';
 import 'objects/platform_block.dart';
 import 'objects/star.dart';
+import 'overlays/hud.dart';
 
-class Zario extends FlameGame with HasCollisionDetection, 
-  HasKeyboardHandlerComponents {
-    
+class Zario extends FlameGame
+    with HasCollisionDetection, HasKeyboardHandlerComponents {
+  Zario();
+
   late ZarioPlayer _zario;
-  double objectSpeed = 0.0;
   late double lastBlockXPosition = 0.0;
   late UniqueKey lastBlockKey;
 
-  @override
-  Color backgroundColor() {
-    return const Color.fromARGB(255, 173, 223, 247);
-  }
+  int starsCollected = 0;
+  int health = 3;
+  double cloudSpeed = 0.0;
+  double objectSpeed = 0.0;
 
   @override
   Future<void> onLoad() async {
+    //debugMode = true; // Uncomment to see the bounding boxes
     await images.loadAll([
       'block.png',
       'ember.png',
@@ -34,46 +36,50 @@ class Zario extends FlameGame with HasCollisionDetection,
       'star.png',
       'water_enemy.png',
     ]);
-    
     camera.viewfinder.anchor = Anchor.topLeft;
-    initializeGame();
 
+    initializeGame(loadHud: true);
+  }
+
+  @override
+  void update(double dt) {
+    if (health <= 0) {
+      overlays.add('GameOver');
+    }
+    super.update(dt);
+  }
+
+  @override
+  Color backgroundColor() {
+    return const Color.fromARGB(255, 173, 223, 247);
   }
 
   void loadGameSegments(int segmentIndex, double xPositionOffset) {
     for (final block in segments[segmentIndex]) {
-      switch (block.blockType) {
-        case GroundBlock:
-          world.add(
-            GroundBlock(
-              gridPosition: block.gridPosition,
-              xOffset: xPositionOffset,
-            ),
-          );
-        case PlatformBlock:
-          add(PlatformBlock(
+      final component = switch (block.blockType) {
+        const (GroundBlock) => GroundBlock(
             gridPosition: block.gridPosition,
             xOffset: xPositionOffset,
-          ));
-        case Star:
-          world.add(
-            Star(
-              gridPosition: block.gridPosition,
-              xOffset: xPositionOffset,
-            ),
-          );
-        case WaterEnemy:
-          world.add(
-            WaterEnemy(
+          ),
+        const (PlatformBlock) => PlatformBlock(
             gridPosition: block.gridPosition,
             xOffset: xPositionOffset,
-            ),
-          );
-      }
+          ),
+        const (Star) => Star(
+            gridPosition: block.gridPosition,
+            xOffset: xPositionOffset,
+          ),
+        const (WaterEnemy) => WaterEnemy(
+            gridPosition: block.gridPosition,
+            xOffset: xPositionOffset,
+          ),
+        _ => throw UnimplementedError(),
+      };
+      world.add(component);
     }
   }
 
-  void initializeGame() {
+  void initializeGame({required bool loadHud}) {
     // Assume that size.x < 3200
     final segmentsToLoad = (size.x / 640).ceil();
     segmentsToLoad.clamp(0, segments.length);
@@ -83,11 +89,17 @@ class Zario extends FlameGame with HasCollisionDetection,
     }
 
     _zario = ZarioPlayer(
-    position: Vector2(128, canvasSize.y - 128),
+      position: Vector2(128, canvasSize.y - 128),
     );
     world.add(_zario);
+    if (loadHud) {
+      camera.viewport.add(Hud());
+    }
   }
 
+  void reset() {
+    starsCollected = 0;
+    health = 3;
+    initializeGame(loadHud: false);
+  }
 }
-
-

@@ -53,6 +53,9 @@ class GroundBlock extends SpriteComponent with HasGameReference<Zario> {
         game.lastBlockXPosition = position.x + size.x - 10;
       }
     }
+    if (game.health <= 0) {
+      removeFromParent();
+    }
 
     super.update(dt);
   }

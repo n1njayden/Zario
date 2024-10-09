@@ -92,13 +92,13 @@ class ZarioPlayer extends SpriteAnimationComponent
     position += velocity * dt;
 
     // If ember fell in pit, then game over.
-    // if (position.y > game.size.y + size.y) {
-    //   game.health = 0;
-    // }
+    if (position.y > game.size.y + size.y) {
+      game.health = 0;
+    }
 
-    // if (game.health <= 0) {
-    //   removeFromParent();
-    // }
+    if (game.health <= 0) {
+      removeFromParent();
+    }
 
     // Flip ember if needed.
     if (horizontalDirection < 0 && scale.x > 0) {
@@ -136,7 +136,7 @@ class ZarioPlayer extends SpriteAnimationComponent
 
     if (other is Star) {
       other.removeFromParent();
-      // game.starsCollected++;
+      game.starsCollected++;
     }
 
     if (other is WaterEnemy) {
@@ -149,7 +149,7 @@ class ZarioPlayer extends SpriteAnimationComponent
   // to make it blink.
   void hit() {
     if (!hitByEnemy) {
-      // game.health--;
+      game.health--;
       hitByEnemy = true;
     }
     add(
