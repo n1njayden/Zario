@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zario/zario.dart';
 
-import '../zario.dart';
-
 class GameOver extends StatelessWidget {
   // Reference to parent game.
   final Zario game;
